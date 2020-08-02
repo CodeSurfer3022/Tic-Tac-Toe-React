@@ -5,7 +5,7 @@ import './index.css';
 class Square extends React.Component{
     render() {
         return (
-            <button className = 'square'>
+            <button className = 'square' onClick = {this.props.onClick}>
                 {this.props.value}
             </button>
         );
@@ -15,7 +15,7 @@ class Square extends React.Component{
 class Board extends React.Component {
     renderSquare(i) {
         return (
-            <Square value = {i}/>
+            <Square value = {this.props.squares[i]} onClick = {() => this.props.onClick(i)}/>
         );
     }
     render() {
@@ -51,6 +51,21 @@ class Game extends React.Component {
             xIsNext: true
         };
     }
+    handleClick(i) {
+        const history = this.state.history;
+        const current = history[history.length - 1];
+        const squares = current.squares.slice();
+
+        if(calculateWinner(squares) || squares[i]) return;
+
+        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        this.setState({
+            history: history.concat([
+                {squares: squares}
+            ]),
+            xIsNext: !this.state.xIsNext
+        });
+    }
     render() {
         const history = this.state.history;
         const current = history[history.length - 1];
@@ -66,7 +81,7 @@ class Game extends React.Component {
 
         return(
             <div className = 'game'>
-                <Board />
+                <Board squares = {squares} onClick = {(i) => this.handleClick(i)}/>
                 <div className = 'game-info'>
                     <div className = 'status'>{status}</div>
                     <ol>{/**/}</ol>
